@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionnaire de Formation — Yes Conciergerie</title>
+<style>
+  :root {
+    --orange: #E8622A;
+    --orange-light: #F08050;
+    --dark: #1A1A2E;
+    --creme: #FAF6F1;
+    --grey: #F0EDE8;
+    --border: #DDD8D2;
+    --text: #2C2C2C;
+    --muted: #8A8480;
+    --white: #FFFFFF;
+    --green: #2D7A4F;
+    --red: #C0392B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    background: var(--creme);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--dark);
+    padding: 18px 20px 14px;
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .header-logo {
+    width: 38px; height: 38px;
+    background: var(--orange);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 900; color: #fff;
+    letter-spacing: -1px; flex-shrink: 0;
+  }
+  .header-text h1 {
+    font-size: 15px; font-weight: 700; color: #fff;
+    line-height: 1.2;
+  }
+  .header-text p {
+    font-size: 11px; color: var(--orange-light);
+    letter-spacing: 0.5px;
+  }
+  .header-badge {
+    margin-left: auto;
+    background: var(--orange);
+    color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── IDENTITY SCREEN ── */
+  .identity-wrap {
+    max-width: 480px;
+    margin: 32px auto;
+    padding: 0 20px;
+  }
+  .identity-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  }
+  .identity-card h2 {
+    font-size: 20px; font-weight: 800;
+    color: var(--dark); margin-bottom: 6px;
+  }
+  .identity-card p {
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 24px; line-height: 1.5;
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 12px; font-weight: 700;
+    color: var(--dark); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 7px;
+  }
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    font-size: 15px;
+    background: var(--creme);
+    color: var(--text);
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--orange);
+    background: var(--white);
+  }
+  .form-group input::placeholder { color: #bbb; }
+  .btn-start {
+    width: 100%;
+    padding: 15px;
+    background: var(--orange);
+    color: #fff; border: none;
+    border-radius: 10px;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-start:active { transform: scale(0.98); background: #d05520; }
+  .info-box {
+    margin-top: 18px;
+    background: #FFF4EF;
+    border: 1px solid #F5C4AA;
+    border-radius: 9px;
+    padding: 12px 14px;
+    font-size: 12px; color: var(--dark); line-height: 1.5;
+  }
+  .info-box strong { color: var(--orange); }
+
+  /* ── QUIZ SCREEN ── */
+  .quiz-progress {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .progress-bar-wrap {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+  .progress-label {
+    font-size: 12px; font-weight: 700;
+    color: var(--orange); white-space: nowrap;
+    min-width: 48px; text-align: right;
+  }
+  .candidate-tag {
+    font-size: 11px; color: var(--muted);
+    background: var(--grey); padding: 3px 9px;
+    border-radius: 20px; white-space: nowrap;
+    max-width: 130px; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .question-container {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 24px 18px 100px;
+  }
+
+  .question-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 22px 20px 18px;
+    border: 1px solid var(--border);
+    box-shadow: 0 3px 16px rgba(0,0,0,0.06);
+    animation: slideIn 0.2s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-num {
+    display: inline-block;
+    font-size: 10px; font-weight: 800;
+    color: var(--orange); letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .q-module {
+    display: inline-block;
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--grey);
+    padding: 2px 8px; border-radius: 20px;
+    margin-left: 8px;
+  }
+  .q-text {
+    font-size: 16px; font-weight: 700;
+    color: var(--dark); line-height: 1.4;
+    margin-bottom: 20px;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .option:active { background: var(--grey); }
+  .option.selected {
+    border-color: var(--orange);
+    background: #FFF4EF;
+  }
+  .option-letter {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: var(--grey);
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: var(--muted);
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .option.selected .option-letter {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: #fff;
+  }
+  .option-text {
+    font-size: 14px; line-height: 1.4; padding-top: 3px;
+    color: var(--text);
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex; gap: 10px;
+    max-width: 560px; margin: 0 auto;
+  }
+  .btn-nav {
+    flex: 1;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-nav:active { transform: scale(0.97); }
+  .btn-prev {
+    background: var(--grey);
+    color: var(--muted);
+    flex: 0.6;
+  }
+  .btn-next {
+    background: var(--dark);
+    color: #fff;
+  }
+  .btn-next.orange { background: var(--orange); }
+  .btn-next:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* ── RESULTS SCREEN ── */
+  .results-wrap {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 24px 18px 40px;
+  }
+  .score-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+    text-align: center;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 16px rgba(0,0,0,0.07);
+  }
+  .score-circle {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(var(--orange) 0%, var(--border) 0%);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    position: relative;
+  }
+  .score-circle-inner {
+    width: 76px; height: 76px;
+    background: var(--white);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+  .score-number { font-size: 26px; font-weight: 900; color: var(--dark); line-height: 1; }
+  .score-denom  { font-size: 12px; color: var(--muted); }
+  .score-name   { font-size: 18px; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
+  .score-mode   { font-size: 12px; color: var(--orange); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .score-date   { font-size: 12px; color: var(--muted); }
+
+  .review-list { display: flex; flex-direction: column; gap: 10px; }
+  .review-item {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+  }
+  .review-item.correct { border-left: 4px solid var(--green); }
+  .review-item.wrong   { border-left: 4px solid var(--red); }
+  .review-q { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .review-answer {
+    font-size: 12px; padding: 5px 10px;
+    border-radius: 6px; display: inline-block;
+    margin-bottom: 4px;
+  }
+  .review-answer.correct-a { background: #EAF7F0; color: var(--green); font-weight: 700; }
+  .review-answer.wrong-a   { background: #FDEEEC; color: var(--red); font-weight: 700; }
+  .review-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+
+  .btn-retry {
+    width: 100%; margin-top: 20px;
+    padding: 15px; background: var(--orange);
+    color: #fff; border: none; border-radius: 10px;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .btn-results-all {
+    width: 100%; margin-top: 10px;
+    padding: 13px; background: var(--dark);
+    color: #fff; border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+
+  /* ── ADMIN SCREEN ── */
+  .admin-wrap {
+    max-width: 700px; margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
+  .admin-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .admin-header h2 { font-size: 18px; font-weight: 800; color: var(--dark); }
+  .btn-export {
+    padding: 9px 16px;
+    background: var(--orange); color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .result-row {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .result-row .rr-name  { font-size: 14px; font-weight: 700; color: var(--dark); flex: 1; min-width: 120px; }
+  .result-row .rr-mode  { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+  .rr-mode.pre  { background: #E8F4FF; color: #1a6fbd; }
+  .rr-mode.post { background: #EAF7F0; color: var(--green); }
+  .result-row .rr-score {
+    font-size: 18px; font-weight: 900; color: var(--orange);
+    min-width: 50px; text-align: right;
+  }
+  .result-row .rr-date { font-size: 11px; color: var(--muted); min-width: 100px; text-align: right; }
+  .empty-admin { text-align: center; color: var(--muted); padding: 40px 20px; font-size: 14px; }
+
+  .admin-link {
+    text-align: center; padding: 14px 20px;
+    font-size: 12px; color: var(--muted);
+  }
+  .admin-link button {
+    background: none; border: none;
+    color: var(--muted); font-size: 11px;
+    cursor: pointer; text-decoration: underline;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 400px) {
+    .q-text { font-size: 15px; }
+    .option-text { font-size: 13px; }
+    .header-text h1 { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">Y</div>
+  <div class="header-text">
+    <h1>Yes Conciergerie</h1>
+    <p>ÉVALUATION DE FORMATION — RS6977</p>
+  </div>
+  <div class="header-badge" id="modeBadge">Pré-formation</div>
+</div>
+
+<!-- ══ ÉCRAN 1 : IDENTITÉ ══════════════════════════════════════ -->
+<div id="screenIdentity" class="screen active">
+  <div class="identity-wrap">
+    <div class="identity-card">
+      <h2>Bienvenue</h2>
+      <p>Répondez à ces 20 questions honnêtement, sans consulter vos notes. Ce questionnaire est réalisé avant <em>et</em> après la formation pour mesurer votre progression.</p>
+
+      <div class="form-group">
+        <label>Votre prénom et nom</label>
+        <input type="text" id="inputName" placeholder="Ex : Marie Dupont" autocomplete="name" />
+      </div>
+      <div class="form-group">
+        <label>Territoire / Ville de votre franchise</label>
+        <input type="text" id="inputCity" placeholder="Ex : Lyon, Bordeaux..." />
+      </div>
+      <div class="form-group">
+        <label>Moment du questionnaire</label>
+        <select id="inputMode">
+          <option value="pre">Avant la formation (Pré-formation)</option>
+          <option value="post">Après la formation (Post-formation)</option>
+        </select>
+      </div>
+
+      <button class="btn-start" onclick="startQuiz()">Commencer le questionnaire →</button>
+
+      <div class="info-box">
+        <strong>20 questions · ~8 minutes</strong><br>
+        Vos résultats sont enregistrés et transmis au formateur. Pas de bonne ou mauvaise réponse au sens négatif — c'est un outil de mesure, pas une sanction.
+      </div>
+    </div>
+    <div class="admin-link">
+      <button onclick="showAdmin()">▸ Accès résultats formateur</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ÉCRAN 2 : QUIZ ══════════════════════════════════════════ -->
+<div id="screenQuiz" class="screen">
+  <div class="quiz-progress">
+    <div class="candidate-tag" id="progressName">—</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">1/20</div>
+  </div>
+
+  <div class="question-container">
+    <div class="question-card" id="questionCard">
+      <!-- injected by JS -->
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="btn-nav btn-prev" id="btnPrev" onclick="prevQ()">← Retour</button>
+    <button class="btn-nav btn-next" id="btnNext" onclick="nextQ()" disabled>Suivant →</button>
+  </div>
+</div>
+
+<!-- ══ ÉCRAN 3 : RÉSULTATS ════════════════════════════════════ -->
+<div id="screenResults" class="screen">
+  <div class="results-wrap">
+    <div class="score-card">
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-circle-inner">
+          <span class="score-number" id="scoreNum">—</span>
+          <span class="score-denom">/20</span>
+        </div>
+      </div>
+      <div class="score-name" id="scoreName">—</div>
+      <div class="score-mode" id="scoreMode">—</div>
+      <div class="score-date" id="scoreDate">—</div>
+    </div>
+    <div class="review-list" id="reviewList"></div>
+    <button class="btn-retry" onclick="restart()">Recommencer</button>
+    <button class="btn-results-all" onclick="showAdmin()">Voir tous les résultats</button>
+  </div>
+</div>
+
+<!-- ══ ÉCRAN 4 : ADMIN ════════════════════════════════════════ -->
+<div id="screenAdmin" class="screen">
+  <div class="admin-wrap">
+    <div class="admin-header">
+      <h2>Résultats Formateur</h2>
+      <button class="btn-export" onclick="exportCSV()">⬇ Exporter CSV</button>
+    </div>
+    <div id="adminList"></div>
+    <button class="btn-retry" style="margin-top:20px" onclick="showScreen('screenIdentity')">← Retour au questionnaire</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// BANQUE DE QUESTIONS — 20 QCM couvrant les 8 modules Yes
+// ══════════════════════════════════════════════════════════════
+const QUESTIONS = [
+  {
+    module: "Module 1",
+    q: "Qu'est-ce qu'une conciergerie de locations courte durée (LCD) ?",
+    opts: [
+      "Une agence immobilière qui vend des logements",
+      "Une entreprise de services qui gère des locations LCD pour le compte de propriétaires",
+      "Un service réservé aux hôtels et résidences de tourisme",
+      "Une plateforme de réservation en ligne type Airbnb"
+    ],
+    correct: 1
+  },
+  {
+    module: "Module 1",
+    q: "Parmi les éléments suivants, lequel fait partie de la check-list de lancement d'une conciergerie Yes ?",
+    opts: [
+      "Signer un bail commercial avant tout autre démarche",
+      "Valider son prestataire linge, ses intervenants ménage et son compte YouSign avant le premier mandat",
+      "Attendre d'avoir 10 logements pour se lancer sur les plateformes",
+      "Acheter un local commercial dès le premier mois"
+    ],
+    correct: 1
+  },
+  {
+    module: "Module 2",
+    q: "Parmi les 3 types de clients Yes Conciergerie, lequel est le plus facile à convertir selon le manuel opératoire ?",
+    opts: [
+      "Le propriétaire primo-bailleur qui n'a jamais loué",
+      "Le locataire qui réserve en direct",
+      "Le propriétaire qui est déjà client d'une conciergerie concurrente",
+      "L'office du tourisme local"
+    ],
+    correct: 2
+  },
+  {
+    module: "Module 2",
+    q: "Quelle méthode Pappers permet de prospecter des propriétaires bailleurs ?",
+    opts: [
+      "Filtrer par forme juridique SCI et EI, activité 55.20Z, effectif 0, objet social location meublée",
+      "Chercher uniquement les entreprises du secteur hôtelier dans la ville",
+      "Filtrer par CA supérieur à 100 000 € dans l'immobilier",
+      "Utiliser le registre des copropriétés via le site du gouvernement"
+    ],
+    correct: 0
+  },
+  {
+    module: "Module 3",
+    q: "Dans le discours commercial Yes en entonnoir, dans quel ordre enchaîne-t-on les 4 étapes ?",
+    opts: [
+      "Solution → Bénéfice → Besoin → Accroche",
+      "Besoin → Accroche → Solution → Bénéfice",
+      "Accroche → Créer le besoin → Proposer la solution → Montrer le bénéfice",
+      "Tarif → Solution → Accroche → Besoin"
+    ],
+    correct: 2
+  },
+  {
+    module: "Module 3",
+    q: "Selon les piliers Yes, quel argument utilise-t-on pour répondre à l'objection 'Je gère déjà très bien mes locations tout seul' ?",
+    opts: [
+      "\"Vous avez tort, vous perdez du temps et de l'argent.\"",
+      "\"Votre logement est mieux entretenu qu'en gestion classique — et vous gagnez du temps pour ce qui compte vraiment.\"",
+      "\"Nos tarifs sont moins chers que la concurrence.\"",
+      "\"Vous n'avez aucune assurance si quelque chose se passe mal.\""
+    ],
+    correct: 1
+  },
+  {
+    module: "Module 3",
+    q: "Lors d'une négociation propriétaire, à quel moment donne-t-on le tarif de prestation ?",
+    opts: [
+      "Dès le début de l'entretien pour cadrer les attentes",
+      "Uniquement par email après le RDV",
+      "À la fin de l'entretien, après avoir collecté toutes les informations sur le logement et les objectifs du propriétaire",
+      "On ne donne jamais le tarif, on attend que le propriétaire propose"
+    ],
+    correct: 2
+  },
+  {
+    module: "Module 4",
+    q: "Dès qu'une réservation arrive sur le Channel Manager, quelle est la première action à réaliser ?",
+    opts: [
+      "Envoyer la facture au propriétaire",
+      "Contacter le locataire par WhatsApp et lui proposer les services Yes (linge, transferts, excursions)",
+      "Commander immédiatement le matériel de puériculture",
+      "Appeler le propriétaire pour valider la réservation"
+    ],
+    correct: 1
+  },
+  {
+    module: "Module 4",
+    q: "Un locataire vous prévient qu'il sera en retard de 3h à son arrivée. Quelle est la bonne réaction Yes ?",
+    opts: [
+      "Lui faire une réflexion pour qu'il soit plus ponctuel la prochaine fois",
+      "Annuler le check-in et lui demander de reprendre contact",
+      "Le rassurer, déposer la clé en keybox avec les codes d'accès, proposer un check-in le lendemain",
+      "Lui facturer des frais de retard supplémentaires"
+    ],
+    correct: 2
+  },
+  {
+    module: "Module 4",
+    q: "Lors du check-out, que doit-on systématiquement vérifier avant de laisser partir le locataire ?",
+    opts: [
+      "Seulement les clés et télécommandes",
+      "Les télécommandes, clés, bip garage, alèses, état général du logement, frigo et poubelles vidés",
+      "Uniquement l'état du linge",
+      "La note Airbnb déposée par le locataire"
+    ],
+    correct: 1
+  },
+  {
+    module: "Module 5",
+    q: "Quel est le partenaire linge national référencé par Yes Conciergerie ?",
+    opts: [
+      "Elis",
+      "Initial",
+      "EasyLinge",
+      "Lavotel"
+    ],
+    correct: 2
+  },
+  {
+    module: "Module 5",
+    q: "Quelle est la règle d'or du protocole ménage Yes pour éviter les traces sur les surfaces ?",
+    opts: [
+      "Utiliser uniquement des produits chlorés professionnels",
+      "Travailler exclusivement avec des éponges jetables",
+      "Utiliser des chiffons microfibre de couleurs différentes selon les zones — sans détergent si possible",
+      "Commencer toujours par la cuisine, quelle que soit la taille du logement"
+    ],
+    correct: 2
+  },
+  {
+    module: "Module 5",
+    q: "Dans quelle pièce le ménage professionnel Yes est-il le plus décisif pour les avis voyageurs ?",
+    opts: [
+      "Le salon",
+      "La chambre principale",
+      "La cuisine et la salle de bain",
+      "L'entrée et le couloir"
+    ],
+    correct: 2
+  },
+  {
+    module: "Module 6",
+    q: "Quelle est la différence fondamentale entre chiffre d'affaires et résultat comptable ?",
+    opts: [
+      "Le CA inclut la TVA, le résultat est hors taxes",
+      "Le CA est la somme des ventes HT ; le résultat est le CA moins toutes les charges et amortissements",
+      "Le résultat est calculé uniquement sur les encaissements réels du mois",
+      "Il n'y a pas de différence en micro-entreprise"
+    ],
+    correct: 1
+  },
+  {
+    module: "Module 6",
+    q: "Quelle est la durée maximale recommandée pour traiter vos interventions non facturées et mettre à jour Sellsy ?",
+    opts: [
+      "Une fois par mois suffit",
+      "2h tous les 3 jours maximum",
+      "Chaque soir avant de dormir",
+      "Uniquement en fin de saison"
+    ],
+    correct: 1
+  },
+  {
+    module: "Module 7",
+    q: "Selon le nouvel algorithme Airbnb 2024-2025, qu'est-ce qui est désormais récompensé au-delà du badge Superhost ?",
+    opts: [
+      "Le nombre d'années de présence sur la plateforme",
+      "Les propriétaires qui proposent des expériences et services aux voyageurs dans leurs annonces",
+      "Les logements avec piscine privée uniquement",
+      "Les tarifs les plus bas du marché local"
+    ],
+    correct: 1
+  },
+  {
+    module: "Module 7",
+    q: "Quelle est la première étape pour qu'un propriétaire bénéficie de Yes Excursions dans son annonce ?",
+    opts: [
+      "Signer un contrat spécifique Yes Excursions en plus du mandat de gestion",
+      "Payer un abonnement mensuel supplémentaire",
+      "Il suffit que Yes Conciergerie soit co-hôte de l'annonce Airbnb pour activer la connexion",
+      "Attendre 6 mois de gestion avant l'activation"
+    ],
+    correct: 2
+  },
+  {
+    module: "Module 8",
+    q: "Quelle est la principale nouveauté de la Loi Le Meur (novembre 2024) pour les meublés de tourisme ?",
+    opts: [
+      "L'obligation d'afficher le prix du ménage séparément sur les annonces",
+      "L'abattement micro-BIC est réduit et les quotas de nuitées sont renforcés — avec un cadre déclaratif durci",
+      "L'interdiction de louer des logements de moins de 20m²",
+      "La mise en place d'un agrément obligatoire pour toutes les conciergeries"
+    ],
+    correct: 1
+  },
+  {
+    module: "Module 8",
+    q: "Où doit-on déclarer un meublé de tourisme en premier lieu ?",
+    opts: [
+      "Auprès de l'INSEE uniquement",
+      "Sur le site Airbnb ou Booking qui transmettent automatiquement la déclaration",
+      "En mairie de la commune où se situe le logement",
+      "Auprès de la préfecture de département"
+    ],
+    correct: 2
+  },
+  {
+    module: "Général",
+    q: "Parmi les affirmations suivantes, laquelle résume le mieux le positionnement Yes Conciergerie vs. les conciergeries classiques ?",
+    opts: [
+      "Yes Conciergerie est moins chère que la concurrence",
+      "Yes Conciergerie propose uniquement du ménage et du linge",
+      "Yes Conciergerie est le seul acteur à proposer une formation intégrée dans un réseau de franchise opérationnel avec des outils propriétaires et Yes Excursions",
+      "Yes Conciergerie est un service exclusivement réservé aux villas de luxe"
+    ],
+    correct: 2
+  }
+];
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let currentQ   = 0;
+let answers    = new Array(QUESTIONS.length).fill(null);
+let candidateName = "";
+let candidateCity = "";
+let quizMode   = "pre";
+
+// ══════════════════════════════════════════════════════════════
+// STORAGE (uses window.storage if available, else localStorage)
+// ══════════════════════════════════════════════════════════════
+async function saveResult(data) {
+  const key = `result_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+  const val = JSON.stringify(data);
+  try {
+    if (window.storage) {
+      await window.storage.set(key, val);
+    } else {
+      localStorage.setItem(key, val);
+    }
+  } catch(e) {
+    // fallback silent
+    localStorage.setItem(key, val);
+  }
+}
+
+async function loadAllResults() {
+  const results = [];
+  try {
+    if (window.storage) {
+      const list = await window.storage.list("result_");
+      if (list && list.keys) {
+        for (const k of list.keys) {
+          try {
+            const r = await window.storage.get(k);
+            if (r && r.value) results.push(JSON.parse(r.value));
+          } catch(e) {}
+        }
+      }
+    } else {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith("result_")) {
+          try { results.push(JSON.parse(localStorage.getItem(k))); } catch(e) {}
+        }
+      }
+    }
+  } catch(e) {
+    // fallback localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith("result_")) {
+        try { results.push(JSON.parse(localStorage.getItem(k))); } catch(e) {}
+      }
+    }
+  }
+  return results.sort((a,b) => new Date(b.date) - new Date(a.date));
+}
+
+// ══════════════════════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ══════════════════════════════════════════════════════════════
+// START
+// ══════════════════════════════════════════════════════════════
+function startQuiz() {
+  const name = document.getElementById('inputName').value.trim();
+  const city = document.getElementById('inputCity').value.trim();
+  const mode = document.getElementById('inputMode').value;
+
+  if (!name) { document.getElementById('inputName').focus(); return; }
+  if (!city) { document.getElementById('inputCity').focus(); return; }
+
+  candidateName = name;
+  candidateCity = city;
+  quizMode = mode;
+  currentQ = 0;
+  answers  = new Array(QUESTIONS.length).fill(null);
+
+  document.getElementById('modeBadge').textContent = mode === 'pre' ? 'Pré-formation' : 'Post-formation';
+  document.getElementById('progressName').textContent = name;
+
+  showScreen('screenQuiz');
+  renderQ();
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER QUESTION
+// ══════════════════════════════════════════════════════════════
+function renderQ() {
+  const q   = QUESTIONS[currentQ];
+  const pct = ((currentQ + 1) / QUESTIONS.length * 100).toFixed(0);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${currentQ+1}/20`;
+
+  const letters = ['A','B','C','D'];
+  const optsHtml = q.opts.map((o, i) => {
+    const sel = answers[currentQ] === i ? 'selected' : '';
+    return `<div class="option ${sel}" onclick="selectOpt(${i})">
+      <div class="option-letter">${letters[i]}</div>
+      <div class="option-text">${o}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('questionCard').innerHTML = `
+    <div>
+      <span class="q-num">Question ${currentQ+1}</span>
+      <span class="q-module">${q.module}</span>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="options">${optsHtml}</div>
+  `;
+
+  const answered = answers[currentQ] !== null;
+  document.getElementById('btnNext').disabled = !answered;
+  document.getElementById('btnNext').className = 'btn-nav btn-next' + (currentQ === QUESTIONS.length-1 ? ' orange' : '');
+  document.getElementById('btnNext').textContent = currentQ === QUESTIONS.length-1 ? 'Terminer →' : 'Suivant →';
+  document.getElementById('btnPrev').style.display = currentQ === 0 ? 'none' : 'flex';
+}
+
+function selectOpt(i) {
+  answers[currentQ] = i;
+  document.getElementById('btnNext').disabled = false;
+  document.querySelectorAll('.option').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+    el.querySelector('.option-letter').textContent = 'ABCD'[idx];
+  });
+  document.querySelectorAll('.option').forEach((el, idx) => {
+    el.querySelector('.option-letter').textContent = ['A','B','C','D'][idx];
+  });
+  renderQ();
+}
+
+function nextQ() {
+  if (answers[currentQ] === null) return;
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQ();
+    window.scrollTo(0,0);
+  } else {
+    finishQuiz();
+  }
+}
+
+function prevQ() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQ();
+    window.scrollTo(0,0);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// FINISH
+// ══════════════════════════════════════════════════════════════
+async function finishQuiz() {
+  const score = answers.reduce((acc, a, i) => acc + (a === QUESTIONS[i].correct ? 1 : 0), 0);
+  const now   = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' })
+    + ' ' + now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+
+  const resultData = {
+    name: candidateName,
+    city: candidateCity,
+    mode: quizMode,
+    score,
+    total: QUESTIONS.length,
+    pct: Math.round(score / QUESTIONS.length * 100),
+    date: now.toISOString(),
+    answers: [...answers]
+  };
+
+  await saveResult(resultData);
+
+  // Afficher résultats
+  const pct = Math.round(score / QUESTIONS.length * 100);
+  document.getElementById('scoreNum').textContent  = score;
+  document.getElementById('scoreName').textContent = candidateName + (candidateCity ? ` — ${candidateCity}` : '');
+  document.getElementById('scoreMode').textContent = quizMode === 'pre' ? 'PRÉ-FORMATION' : 'POST-FORMATION';
+  document.getElementById('scoreDate').textContent = dateStr;
+
+  // Circle
+  const circle = document.getElementById('scoreCircle');
+  circle.style.background = `conic-gradient(var(--orange) ${pct}%, var(--border) ${pct}%)`;
+
+  // Review
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = QUESTIONS.map((q, i) => {
+    const correct  = answers[i] === q.correct;
+    const letters  = ['A','B','C','D'];
+    return `<div class="review-item ${correct?'correct':'wrong'}">
+      <div class="review-q">${i+1}. ${q.q}</div>
+      ${!correct ? `<div>
+        <div class="review-label">Votre réponse</div>
+        <div class="review-answer wrong-a">${letters[answers[i]]}. ${q.opts[answers[i]]}</div>
+      </div>` : ''}
+      <div>
+        <div class="review-label">Bonne réponse</div>
+        <div class="review-answer correct-a">${letters[q.correct]}. ${q.opts[q.correct]}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  showScreen('screenResults');
+}
+
+// ══════════════════════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════════════════════
+async function showAdmin() {
+  const results = await loadAllResults();
+  const list = document.getElementById('adminList');
+  if (!results.length) {
+    list.innerHTML = '<div class="empty-admin">Aucun résultat enregistré pour l\'instant.</div>';
+  } else {
+    list.innerHTML = results.map(r => {
+      const dateStr = new Date(r.date).toLocaleDateString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric'})
+        + ' ' + new Date(r.date).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+      return `<div class="result-row">
+        <div class="rr-name">${r.name}<br><span style="font-size:11px;color:var(--muted);font-weight:400">${r.city||''}</span></div>
+        <div class="rr-mode ${r.mode}">${r.mode==='pre' ? 'PRÉ' : 'POST'}</div>
+        <div class="rr-score">${r.score}/20</div>
+        <div class="rr-date">${dateStr}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('modeBadge').textContent = 'Résultats';
+  showScreen('screenAdmin');
+}
+
+function exportCSV() {
+  loadAllResults().then(results => {
+    if (!results.length) { alert('Aucun résultat à exporter.'); return; }
+    const rows = [['Nom','Ville','Mode','Score','Total','%','Date']];
+    results.forEach(r => {
+      const d = new Date(r.date);
+      rows.push([
+        `"${r.name}"`,
+        `"${r.city||''}"`,
+        r.mode === 'pre' ? 'Pré-formation' : 'Post-formation',
+        r.score, r.total, r.pct + '%',
+        d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})
+      ]);
+    });
+    const csv  = rows.map(r => r.join(';')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'resultats_yes_formation.csv';
+    a.click(); URL.revokeObjectURL(url);
+  });
+}
+
+function restart() {
+  showScreen('screenIdentity');
+  document.getElementById('modeBadge').textContent = 'Pré-formation';
+}
+</script>
+</body>
+</html>
